@@ -9,8 +9,8 @@
 # report disabled=false and match none of the internal-panel prefixes, so a name
 # test counts them and the laptop panel never recovers. Ask the kernel instead:
 # a real display has a DRM connector, a virtual output has none. Excluding the
-# two names would work today, but 0.55 spelled FALLBACK "HEADLESS-n", and the
-# next rename would put the bug back silently.
+# two names would not do: `hyprctl output create headless <name>` accepts any
+# name, so no list of names covers every virtual output.
 
 drm_path="${OMARCHY_DRM_PATH:-/sys/class/drm}"
 
