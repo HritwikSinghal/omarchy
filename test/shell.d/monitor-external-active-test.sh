@@ -69,6 +69,20 @@ if external_active '[{"name":"eDP-1","disabled":false},{"name":"HEADLESS-1","dis
 fi
 pass "active external monitor helper ignores headless outputs"
 
+# A headless output can take any name, including the tail of a real connector.
+write_connectors eDP-1 connected HDMI-A-1 connected
+if external_active '[{"name":"eDP-1","disabled":false},{"name":"1","disabled":false},{"name":"A-1","disabled":false}]'; then
+  fail "a headless output named like a connector's tail borrows no connector"
+fi
+pass "active external monitor helper matches whole connector names"
+
+write_connectors eDP-1 connected
+mkdir -p "$drm_path/card1-DP-3"
+printf 'connected\n' >"$drm_path/card1-DP-3/status"
+external_active '[{"name":"eDP-1","disabled":false},{"name":"DP-3","disabled":false}]' ||
+  fail "a display on a second GPU is still reported as active"
+pass "active external monitor helper finds displays on any card"
+
 # Everything below is behaviour the helper already had, pinned so the sysfs
 # cross-check cannot quietly take it away.
 write_connectors eDP-1 connected DP-1 connected

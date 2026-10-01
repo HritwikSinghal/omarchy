@@ -15,15 +15,15 @@
 drm_path="${OMARCHY_DRM_PATH:-/sys/class/drm}"
 
 # Anything but `disconnected` counts: a connector with no working detect (VGA,
-# DVI-I) reports `unknown` for a display that is genuinely attached. Virtual
-# outputs have no status file at all, so the loop body never runs for them. The
-# name needs no vetting: it is only ever used inside a quoted glob, where its
-# characters are literal and cannot expand.
+# DVI-I) reports `unknown` for a display that is genuinely attached. The name
+# must be the whole connector after `cardN-`, or a headless output named `1`
+# would be backed by card0-eDP-1.
 backed_by_connector() {
-  local name="$1" status
+  local name="$1" status connector
 
-  for status in "$drm_path"/card*-"$name"/status; do
-    [[ -e $status ]] || continue
+  for status in "$drm_path"/card*-*/status; do
+    connector=${status%/status}
+    [[ ${connector##*/} =~ ^card[0-9]+-(.+)$ && ${BASH_REMATCH[1]} == "$name" ]] || continue
     [[ $(<"$status") == disconnected ]] || return 0
   done
 
