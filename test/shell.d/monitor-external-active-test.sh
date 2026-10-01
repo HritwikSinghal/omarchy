@@ -20,7 +20,7 @@ cat >"$stub_bin/hyprctl" <<'SH'
 #!/bin/bash
 
 if [[ $1 == "monitors" && $2 == "all" && $3 == "-j" ]]; then
-  printf '%s' "${OMARCHY_TEST_MONITORS_JSON:-[]}"
+  printf '%s' "${OMARCHY_TEST_MONITORS_JSON-[]}"
   exit 0
 fi
 
