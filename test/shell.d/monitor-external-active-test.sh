@@ -113,6 +113,16 @@ if external_active '[{"name":"eDP-1","disabled":true},{"name":"DP-1","disabled":
 fi
 pass "active external monitor helper follows the kernel on a just-unplugged output"
 
+# An MST connector leaves sysfs on unplug, so its status can vanish between the
+# glob and the read. A status that cannot be read is not a display.
+write_connectors eDP-1 connected
+mkdir -p "$drm_path/card0-DP-1"
+ln -s missing "$drm_path/card0-DP-1/status"
+if external_active '[{"name":"eDP-1","disabled":true},{"name":"DP-1","disabled":false}]'; then
+  fail "an output whose connector status cannot be read is not counted"
+fi
+pass "active external monitor helper ignores a connector that vanished mid-read"
+
 write_connectors eDP-1 connected DP-1 connected
 if external_active '[{"name":"eDP-1","disabled":false},{"name":"DP-1","disabled":true}]'; then
   fail "an external monitor disabled on purpose is not reported as active"
